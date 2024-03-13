@@ -1,10 +1,15 @@
 import React from 'react'
 import MusicEntry from '../components/MusicEntry'
 import { MusicImageSrc } from '../assets/Images'
+import UserAccount from '../components/UserAccount'
 
 const SearchMusicPage = () => {
+
+  
+
   return (
     <div>
+      <UserAccount />
         <div className='my-2'>
             <p className='text-3xl font-semibold px-2'>
                 Search For Music

@@ -1,11 +1,17 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import MainPageTitle from '../components/MainPageTitle'
 import MusicEntry from '../components/MusicEntry'
 import { MusicImageSrc } from '../assets/Images'
+import UserAccount from '../components/UserAccount'
+import { useNavigate } from 'react-router-dom'
 
 const HomePage = () => {
+  
+  
+
   return (
     <div>
+      <UserAccount />
         <MainPageTitle />
 
         <table className='table-fixed w-full my-6 border-collapse '>
