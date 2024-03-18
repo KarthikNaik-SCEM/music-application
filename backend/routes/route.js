@@ -32,7 +32,8 @@ route.post("/signup",async (req,res)=>{
             }
         }
 
-        const authToken= jwt.sign(data,process.env.JWT_STRING);
+        // const authToken= jwt.sign(data,process.env.JWT_STRING);
+        const authToken= jwt.sign(data,"karthikisaG$oodBoy");
 
 
 
