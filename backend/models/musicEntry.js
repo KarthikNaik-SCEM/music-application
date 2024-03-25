@@ -11,18 +11,19 @@ const musicSchema=mongoose.Schema({
         unique:true
 
     },
-    // uploaderName:{
-    //     type:String,
-    //     required:true
-    // },
+    uploaderName:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'user'
+    },
     dateOfUpload:{
         type:Date,
         default:Date.now
     },
-    // noOfSaves:{
-    //     type:Number,
-    //     required:true
-    // },
+    noOfSaves:{
+        type:Number,
+        required:true,
+        default:0
+    },
     isPublic:{
         type:Boolean,
         required:true
