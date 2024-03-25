@@ -1,6 +1,5 @@
 import { openUploadWidget } from "../utils/CloudinaryService";
 
-
 const CloudinaryUpload = ({addMusicFile}) => {
   const uploadImageWidget = () => {
     // console.log(props);

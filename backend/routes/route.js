@@ -82,5 +82,24 @@ route.post('/login',async(req,res)=>{
     }
 })
 
+route.get('/getuser',async(req,res)=>{
+    try {
+        const token=req.header("auth-token");
+        if(!token){
+            res.status(401).send({error:"please authenticate using valid token"})
+        }
+        
+        const data=jwt.verify(token,process.env.JWT_STRING);   
+        
+        const userDetails= await User.findOne({_id:data.user.id})
+
+        return res.json(userDetails)
+
+    } catch (error) {
+        console.log(error)
+        return res.status("500").json({"error":"error has occured"})
+
+    }
+})
 
 export default route;
