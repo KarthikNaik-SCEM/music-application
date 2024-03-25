@@ -1,12 +1,23 @@
 import express from "express"
 import MusicEntry from "../models/musicEntry.js";
+import dotenv from 'dotenv'
+import jwt from "jsonwebtoken"
 
 const musicRoutes=express.Router()
 
 // Retrieve Songs   
 musicRoutes.get("/musicentries", async (req, res) => {
     try {
-        const songs = await MusicEntry.find();
+
+        const token=req.header("auth-token");
+        if(!token){
+            res.status(401).send({error:"please authenticate using valid token"})
+        }
+        
+        const data=jwt.verify(token,process.env.JWT_STRING);    
+
+
+        const songs = await MusicEntry.find({uploaderName:data.user.id});
         return res.status(200).json(songs);
     } catch (error) {
         console.error(error);
@@ -14,14 +25,44 @@ musicRoutes.get("/musicentries", async (req, res) => {
     }
 });
 
+// Retrieve All Public Songs   
+musicRoutes.get("/publicmusicentries", async (req, res) => {
+    try {
+
+        const token=req.header("auth-token");
+        if(!token){
+            res.status(401).send({error:"please authenticate using valid token"})
+        }
+        
+        const data=jwt.verify(token,process.env.JWT_STRING);    
+
+
+        const songs = await MusicEntry.find({isPublic:true});
+        return res.status(200).json(songs);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+
 // Create Songs
 musicRoutes.post("/musicentry", async (req, res) => {
     try {
         const { musicfile, musicTitle, isPublic } = req.body;
-        if (!musicfile || !musicTitle || !isPublic) {
+        if (!musicfile || !musicTitle) {
             return res.status(400).json({ error: "Insufficient details to create music entry" });
         }
-        const musicDetails = { musicfile, musicTitle, isPublic };
+        
+        const token=req.header("auth-token");
+        if(!token){
+            res.status(401).send({error:"please authenticate using valid token"})
+        }
+        
+        const data=jwt.verify(token,process.env.JWT_STRING);    
+        
+        const musicDetails = { musicfile, musicTitle,uploaderName:data.user.id, isPublic };
+
         const createdMusic = await MusicEntry.create(musicDetails);
         return res.status(201).json(createdMusic);
     } catch (error) {
@@ -31,7 +72,7 @@ musicRoutes.post("/musicentry", async (req, res) => {
 });
 
 // Update Songs
-musicRoutes.put("/musicentry/:id", async (req, res) => {
+musicRoutes.put("/musicupdate/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const { musicfile, musicTitle, isPublic } = req.body;
@@ -46,8 +87,25 @@ musicRoutes.put("/musicentry/:id", async (req, res) => {
     }
 });
 
+// Increment no. of saves in Song
+musicRoutes.put("/musicnoofsaves/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        let { noOfSaves } = req.body;
+        noOfSaves++
+        const updatedNoOfSaves = await MusicEntry.findByIdAndUpdate(id, { noOfSaves }, { new: true });
+        if (!updatedNoOfSaves) {
+            return res.status(404).json({ error: "Music entry not found" });
+        }
+        return res.status(200).json(updatedNoOfSaves);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+});
+
 // Delete Songs
-musicRoutes.delete("/musicentry/:id", async (req, res) => {
+musicRoutes.delete("/musicdelete/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const deletedMusic = await MusicEntry.findByIdAndDelete(id);
